@@ -14,95 +14,69 @@ export default function Router() {
   const [cisco_config, setCiscoConfig] = useState("");
   const [hostname, setHostname] = useState("Router");
   const [domain_name, setDomainName] = useState("localhost");
+  const [banner, setBanner] = useState("Unauthorised Access is Prohibited!");
+  const [login_block_for, setLoginBlockFor] = useState(120);
+  const [login_block_attempts, setLoginBlockAttempts] = useState(3);
+  const [login_block_within, setLoginBlockWithin] = useState(60);
+  const [password_min_length, setPasswordMinLength] = useState(10);
+  const [password_global_config, setPasswordGlobalConfig] = useState("ciscoenpass");
+  const [password_console, setPasswordConsole ] = useState("ciscoconpass");
+  const [username_local, setUsernameLocal] = useState("admin");
+  const [password_local, setPasswordLocal] = useState("admin1pass");
+  const [timeout, setTimeout] = useState(60);
+  const [ssh, setSsh] = useState(true);
+  const [ssh_mod, setSshMod] = useState(1024);
+  const [save_config, setSaveConfig] = useState(true);
 
   useEffect(() => {
-    const general_config = `
+    setCiscoConfig(`
     file prompt quiet
     no ip domain lookup
     ip domain name ${domain_name}
     hostname ${hostname}
-  `;
-  
-  const security_general_config = `
-    banner motd #${variables.banner}#
-    login block-for ${variables.login_block.for} attempts ${variables.login_block.attempts} within ${variables.login_block.within}
-    security passwords min-length ${variables.password_min_length}
-  `;
-  
-  const security_passwords_config = `
+    
+    banner motd #${banner}#
+    login block-for ${login_block_for} attempts ${login_block_attempts} within ${login_block_within}
+    security passwords min-length ${password_min_length}
+    
     service password-encryption
-    enable secret ${variables.ciscoenpass}
-    username ${variables.username_loc} secret ${variables.password_loc}
-  `;
-  
-  const console_config = `
+    enable secret ${password_global_config}
+    username ${username_local} secret ${password_local}
+    
     line con 0
-    exec-timeout ${variables.timeout}
+    exec-timeout ${timeout}
     logging synchronous
-    password ${variables.password_con}
+    password ${password_console}
     login
-  `;
-  
-  const vty_config = `
+    
     line vty 0 4
-    exec-timeout ${variables.timeout}
+    exec-timeout ${timeout}
     logging synchronous
-    ${variables.ssh ? "transport input ssh" : ""}
+    ${ssh ? "transport input ssh" : ""}
     login local
-  `;
-  
-  const ssh_config = `
-    crypto key generate rsa general-keys modulus ${variables.ssh_mod}
+    
+    crypto key generate rsa general-keys modulus ${ssh_mod}
     ip ssh version 2
-  `;
-  
-  const interfaces_config = `
-  
-  `;
-  
-  const dhcp_config = `
-  
-  `;
-  
-  const routing_config = `
-  
-  `;
-  
-  const misc_config = `
-  
-  `;
-  
-    setCiscoConfig(`
-      ${general_config}
-      ${security_general_config}
-      ${security_passwords_config}
-      ${console_config}
-      ${vty_config}
-      ${ssh_config}
-      ${interfaces_config}
-      ${dhcp_config}
-      ${routing_config}
-      ${misc_config}
-    `)
-  }, [hostname, domain_name]);
 
-  let variables = {
-    banner: "Unauthorised Access is Prohibited",
-    login_block: {
-      for: 120,
-      attempts: 3,
-      within: 60
-    },
-    password_min_length: 10,
-    timeout: 60,
-    password_en: "ciscoenpass",
-    password_con: "ciscoconpass",
-    password_loc: "admin1pass",
-    username_loc: "admin",
-    ssh: false,
-    ssh_mod: 1024,
-    save_config: true,
-  };
+    ${save_config ? "copy run start" : ""}
+  `)
+  }, [
+    hostname,
+    domain_name,
+    banner,
+    login_block_for,
+    login_block_within,
+    login_block_attempts,
+    password_min_length,
+    password_global_config,
+    username_local,
+    password_local,
+    timeout,
+    password_console,
+    ssh,
+    ssh_mod,
+
+  ]);
 
   return (
     <>
