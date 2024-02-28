@@ -32,30 +32,30 @@ export default function Router() {
     setCiscoConfig(`
     file prompt quiet
     no ip domain lookup
-    ip domain name ${domain_name}
-    hostname ${hostname}
+    ip domain name ${domain_name || "localhost"}
+    hostname ${hostname || "Router"}
     
-    banner motd #${banner}#
-    login block-for ${login_block_for} attempts ${login_block_attempts} within ${login_block_within}
-    security passwords min-length ${password_min_length}
+    banner motd #${banner || "Unauthorised Access is Prohibited!"}#
+    login block-for ${login_block_for || 120} attempts ${login_block_attempts || 3} within ${login_block_within || 60}
+    security passwords min-length ${password_min_length || 10}
     
     service password-encryption
-    enable secret ${password_global_config}
-    username ${username_local} secret ${password_local}
+    enable secret ${password_global_config || "ciscoenpass"}
+    username ${username_local || "admin"} secret ${password_local || "admin1pass"}
     
     line con 0
-    exec-timeout ${timeout}
+    exec-timeout ${timeout || 60}
     logging synchronous
-    password ${password_console}
+    password ${password_console || "ciscoconpass"}
     login
     
     line vty 0 4
-    exec-timeout ${timeout}
+    exec-timeout ${timeout || 60}
     logging synchronous
     ${ssh ? "transport input ssh" : ""}
     login local
     
-    crypto key generate rsa general-keys modulus ${ssh_mod}
+    crypto key generate rsa general-keys modulus ${ssh_mod || 12024}
     ip ssh version 2
 
     ${save_config ? "copy run start" : ""}
@@ -98,36 +98,36 @@ export default function Router() {
 
           <Form>
             <Form.Label>Banner</Form.Label>
-            <Form.Control type="text" placeholder="Unauthorised Access is Prohibited" className="mb-3" />
+            <Form.Control type="text" placeholder="Unauthorised Access is Prohibited" className="mb-3" onChange={e => setBanner(e.target.value)} />
 
             <Form.Label>Login Blocking</Form.Label>
             <InputGroup className="mb-3">
               <InputGroup.Text>Block For</InputGroup.Text>
-              <Form.Control placeholder="120" />
+              <Form.Control placeholder="120" type="number" onChange={e => setLoginBlockFor(e.target.value)} />
               <InputGroup.Text>Attempts</InputGroup.Text>
-              <Form.Control placeholder="3" />
+              <Form.Control placeholder="3" type="number" onChange={e => setLoginBlockAttempts(e.target.value)} />
               <InputGroup.Text>Within</InputGroup.Text>
-              <Form.Control placeholder="60" />
+              <Form.Control placeholder="60" type="number" onChange={e => setLoginBlockWithin(e.target.value)} />
             </InputGroup>
 
             <Form.Label>Timeout</Form.Label>
-            <Form.Control type="text" placeholder="60" />
+            <Form.Control type="number" placeholder="60" onChange={e => setTimeout(e.target.value)} />
           </Form>
 
           <h2>Passwords</h2>
 
           <Form>
             <Form.Label>Console</Form.Label>
-            <Form.Control type="text" placeholder="ciscoconpass" className="mb-3" />
+            <Form.Control type="text" placeholder="ciscoconpass" className="mb-3" onChange={e => setPasswordConsole(e.target.value)} />
 
             <Form.Label>Global Configuration</Form.Label>
-            <Form.Control type="text" placeholder="ciscoenpass" className="mb-3" />
+            <Form.Control type="text" placeholder="ciscoenpass" className="mb-3" onChange={e => setPasswordGlobalConfig(e.target.value)} />
 
             <Form.Label>Local Username</Form.Label>
-            <Form.Control type="text" placeholder="admin" className="mb-3" />
+            <Form.Control type="text" placeholder="admin" className="mb-3" onChange={e => setUsernameLocal(e.target.value)} />
 
             <Form.Label>Local Password</Form.Label>
-            <Form.Control type="text" placeholder="admin1pass" />
+            <Form.Control type="text" placeholder="admin1pass" onChange={e => setPasswordLocal(e.target.value)} />
           </Form>
 
           <h1>Console</h1>
@@ -137,6 +137,13 @@ export default function Router() {
           <h1>SSH</h1>
 
           <h1>Interfaces</h1>
+          <Form>
+            <Form.Label>Console</Form.Label>
+            <Form.Control type="text" placeholder="ciscoconpass" className="mb-3" onChange={e => setPasswordConsole(e.target.value)} />
+
+            <Form.Label>Global Configuration</Form.Label>
+            <Form.Control type="text" placeholder="ciscoenpass" className="mb-3" onChange={e => setPasswordGlobalConfig(e.target.value)} />
+          </Form>
 
           <h1>DHCP</h1>
 
