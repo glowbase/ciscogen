@@ -1,2 +1,2 @@
 # ciscogen
-Generate Cisco Configs
+A simple React web interface to generate configurations for Cisco switches and routers.
